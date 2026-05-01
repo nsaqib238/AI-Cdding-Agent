@@ -1,0 +1,97 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <%= link_to agent_tasks_path(conversation_id: @conversation.id), class: "inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-4" do %>
+      <%= lucide_icon "arrow-left", class: "w-4 h-4" %>
+      <span>Back to Tasks</span>
+    <% end %>
+
+    <div class="flex items-center gap-3 mb-2">
+      <%= lucide_icon "list-checks", class: "w-8 h-8 text-primary" %>
+      <h1 class="text-3xl font-mono font-bold text-primary">Task Details</h1>
+    </div>
+    <p class="text-secondary">From conversation: <%= link_to @conversation.title, conversation_path(@conversation), class: "text-primary hover:underline" %></p>
+  </div>
+
+  <div class="space-y-6">
+    <!-- Task Header -->
+    <div class="card">
+      <div class="card-body">
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex-1">
+            <h2 class="text-2xl font-mono font-bold text-primary mb-3"><%= @task.title %></h2>
+            
+            <div class="flex items-center gap-3">
+              <% case @task.status %>
+              <% when 'pending' %>
+                <span class="badge badge-secondary badge-lg">
+                  <%= lucide_icon "clock", class: "w-4 h-4 inline-block mr-1" %>
+                  Pending
+                </span>
+              <% when 'in_progress' %>
+                <span class="badge badge-primary badge-lg">
+                  <%= lucide_icon "loader", class: "w-4 h-4 inline-block mr-1" %>
+                  In Progress
+                </span>
+              <% when 'completed' %>
+                <span class="badge badge-success badge-lg">
+                  <%= lucide_icon "check-circle", class: "w-4 h-4 inline-block mr-1" %>
+                  Completed
+                </span>
+              <% when 'failed' %>
+                <span class="badge badge-danger badge-lg">
+                  <%= lucide_icon "x-circle", class: "w-4 h-4 inline-block mr-1" %>
+                  Failed
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <% if @task.description.present? %>
+          <div class="mb-4">
+            <h3 class="text-sm font-semibold text-tertiary uppercase tracking-wide mb-2">Description</h3>
+            <p class="text-secondary"><%= @task.description %></p>
+          </div>
+        <% end %>
+
+        <div class="border-t border-border pt-4 mt-4">
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-tertiary">Created</span>
+              <p class="text-secondary mt-1"><%= @task.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+            </div>
+            <div>
+              <span class="text-tertiary">Last Updated</span>
+              <p class="text-secondary mt-1"><%= @task.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Result -->
+    <% if @task.result.present? %>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="text-lg font-mono font-semibold text-primary flex items-center gap-2">
+            <%= lucide_icon "file-text", class: "w-5 h-5" %>
+            Result
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="bg-surface rounded-lg p-4 font-mono text-sm text-secondary whitespace-pre-wrap">
+<%= @task.result %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Quick Actions -->
+    <div class="flex gap-3">
+      <%= link_to conversation_path(@conversation), class: "btn-primary" do %>
+        <%= lucide_icon "message-square", class: "w-4 h-4" %>
+        <span class="ml-2">View Conversation</span>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<div class="h-screen flex flex-col bg-surface">
+  <!-- Header -->
+  <div class="border-b border-border bg-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <%= link_to coding_file_file_versions_path(coding_file_id: @file.id), class: "inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-4" do %>
+        <%= lucide_icon "arrow-left", class: "w-4 h-4" %>
+        <span>Back to History</span>
+      <% end %>
+
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <%= lucide_icon "file-code", class: "w-6 h-6 text-primary" %>
+            <h1 class="text-xl font-mono font-bold text-primary"><%= @file.relative_path %></h1>
+          </div>
+          <p class="text-sm text-tertiary">Version <%= @version.version %> from <%= time_ago_in_words(@version.created_at) %> ago</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="badge badge-primary">v<%= @version.version %></span>
+          <%= button_to coding_file_file_versions_path(coding_file_id: @file.id, target_version: @version.version), 
+              method: :post,
+              class: "btn-primary btn-sm",
+              data: { turbo_confirm: "Rollback to this version?" } do %>
+            <%= lucide_icon "rotate-ccw", class: "w-4 h-4" %>
+            <span class="ml-2">Rollback to This</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code Viewer -->
+  <div class="flex-1 overflow-hidden">
+    <div class="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="card h-full flex flex-col overflow-hidden">
+        <div class="card-header flex items-center justify-between">
+          <h2 class="text-lg font-mono font-semibold text-primary">Version Content</h2>
+          <div class="flex items-center gap-4 text-sm text-tertiary">
+            <span><%= number_to_human_size(@version.size) %></span>
+            <span><%= @version.content.lines.count %> lines</span>
+          </div>
+        </div>
+
+        <div class="card-body flex-1 overflow-auto p-0">
+          <div class="bg-surface font-mono text-sm">
+            <% if @version.content.present? %>
+              <% @version.content.lines.each_with_index do |line, index| %>
+                <div class="flex hover:bg-surface-elevated">
+                  <div class="w-16 flex-shrink-0 text-right px-4 py-1 text-tertiary bg-surface-elevated select-none">
+                    <%= index + 1 %>
+                  </div>
+                  <div class="flex-1 px-4 py-1 text-secondary whitespace-pre"><%= line.chomp %></div>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="p-12 text-center">
+                <p class="text-tertiary">File is empty</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+<div class="h-screen flex flex-col bg-surface">
+  <!-- Header -->
+  <div class="border-b border-border bg-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <%= link_to conversations_path, class: "text-tertiary hover:text-primary transition-colors" do %>
+            <%= lucide_icon "arrow-left", class: "w-5 h-5" %>
+          <% end %>
+          
+          <div>
+            <h1 class="text-xl font-mono font-bold text-primary">
+              <%= @conversation.title %>
+            </h1>
+            <% if @conversation.project %>
+              <div class="flex items-center gap-2 text-sm text-secondary mt-1">
+                <%= lucide_icon "folder", class: "w-4 h-4" %>
+                <span><%= @conversation.project.name %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <%= link_to agent_tasks_path(conversation_id: @conversation.id), class: "badge badge-secondary" do %>
+            <%= lucide_icon "list-checks", class: "w-4 h-4" %>
+            <%= @conversation.agent_tasks.count %> tasks
+          <% end %>
+          <span class="badge badge-primary">
+            <%= lucide_icon "message-circle", class: "w-4 h-4" %>
+            <%= @messages.count %> messages
+          </span>
+          <%= link_to command_executions_path(conversation_id: @conversation.id), class: "badge badge-secondary" do %>
+            <%= lucide_icon "terminal", class: "w-4 h-4" %>
+            <%= @conversation.command_executions.count %> commands
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Container -->
+  <div class="flex-1 overflow-hidden">
+    <div 
+      class="h-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col"
+      data-controller="chat"
+      data-chat-stream-name-value="<%= @stream_name %>"
+      data-chat-conversation-id-value="<%= @conversation.id %>"
+    >
+      <!-- Messages Container -->
+      <div 
+        class="flex-1 overflow-y-auto mb-6 space-y-4"
+        data-chat-target="messages"
+      >
+        <!-- Existing Messages -->
+        <% @messages.each do |message| %>
+          <div class="message message-<%= message.role %> flex gap-3">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 <%= message.role == 'user' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary' %>">
+              <%= message.role == 'user' ? 'U' : 'AI' %>
+            </div>
+            
+            <div class="flex-1">
+              <div class="message-content text-secondary whitespace-pre-wrap">
+                <%= message.content %>
+              </div>
+              <div class="text-xs text-tertiary mt-1">
+                <%= time_ago_in_words(message.created_at) %> ago
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Input Form -->
+      <div class="border-t border-border pt-4">
+        <%= form_with url: "#", data: { chat_target: "form", action: "submit->chat#submitMessage" }, class: "flex gap-3" do %>
+          <div class="flex-1">
+            <textarea
+              data-chat-target="input"
+              placeholder="Ask AI to help with your code..."
+              rows="3"
+              class="form-input resize-none font-sans"
+              autofocus
+            ></textarea>
+          </div>
+          
+          <div class="flex flex-col gap-2">
+            <button type="submit" class="btn-primary">
+              <%= lucide_icon "send", class: "w-5 h-5" %>
+              <span class="ml-2">Send</span>
+            </button>
+            
+            <button type="button" class="btn-secondary text-sm">
+              <%= lucide_icon "code", class: "w-4 h-4" %>
+              <span class="ml-2">Tools</span>
+            </button>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Status Indicators -->
+      <div class="mt-2 text-xs text-tertiary flex items-center gap-2">
+        <div class="flex items-center gap-1">
+          <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+          <span>Connected</span>
+        </div>
+        <span>•</span>
+        <span>Press Enter to send, Shift+Enter for new line</span>
+      </div>
+    </div>
+  </div>
+</div>

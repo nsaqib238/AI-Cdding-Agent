@@ -1,0 +1,99 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <% if @conversation.present? %>
+      <%= link_to conversation_path(@conversation), class: "inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-4" do %>
+        <%= lucide_icon "arrow-left", class: "w-4 h-4" %>
+        <span>Back to Conversation</span>
+      <% end %>
+    <% end %>
+
+    <h1 class="text-3xl font-mono font-bold text-primary">Command Executions</h1>
+    <% if @conversation.present? %>
+      <p class="text-secondary mt-2">Commands from: <%= @conversation.title %></p>
+    <% end %>
+  </div>
+
+  <div class="grid gap-4">
+    <% if @executions.any? %>
+      <% @executions.each do |execution| %>
+        <%= link_to command_execution_path(execution), class: "card hover:border-primary transition-colors" do %>
+          <div class="card-body">
+            <div class="flex items-start gap-4">
+              <!-- Status Icon -->
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 <%= case execution.status
+                when 'success' then 'bg-success/20 text-success'
+                when 'failed' then 'bg-danger/20 text-danger'
+                when 'running' then 'bg-warning/20 text-warning'
+                else 'bg-secondary/20 text-secondary'
+              end %>">
+                <%= case execution.status
+                  when 'success'
+                    lucide_icon "check-circle", class: "w-6 h-6"
+                  when 'failed'
+                    lucide_icon "x-circle", class: "w-6 h-6"
+                  when 'running'
+                    lucide_icon "loader", class: "w-6 h-6 animate-spin"
+                  else
+                    lucide_icon "terminal", class: "w-6 h-6"
+                end %>
+              </div>
+
+              <!-- Command Details -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="badge <%= case execution.status
+                    when 'success' then 'badge-success'
+                    when 'failed' then 'badge-danger'
+                    when 'running' then 'badge-warning'
+                    else 'badge-secondary'
+                  end %>">
+                    <%= execution.status %>
+                  </span>
+                  <% if execution.exit_code.present? %>
+                    <span class="text-xs text-tertiary">exit: <%= execution.exit_code %></span>
+                  <% end %>
+                </div>
+
+                <div class="font-mono text-sm text-primary mb-2 truncate">
+                  $ <%= execution.command %>
+                </div>
+
+                <% if execution.output.present? %>
+                  <div class="font-mono text-xs text-tertiary bg-surface-elevated rounded px-2 py-1 truncate">
+                    <%= execution.output.lines.first&.strip || execution.output.strip %>
+                  </div>
+                <% end %>
+
+                <div class="flex items-center gap-3 text-xs text-tertiary mt-2">
+                  <% if @conversation.blank? && execution.conversation.present? %>
+                    <div class="flex items-center gap-1">
+                      <%= lucide_icon "message-circle", class: "w-3 h-3" %>
+                      <span><%= execution.conversation.title %></span>
+                    </div>
+                  <% end %>
+                  <div class="flex items-center gap-1">
+                    <%= lucide_icon "clock", class: "w-3 h-3" %>
+                    <span><%= time_ago_in_words(execution.created_at) %> ago</span>
+                  </div>
+                </div>
+              </div>
+
+              <%= lucide_icon "chevron-right", class: "w-5 h-5 text-tertiary flex-shrink-0" %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <div class="mt-6">
+        <%= paginate @executions %>
+      </div>
+    <% else %>
+      <div class="card">
+        <div class="card-body text-center py-12">
+          <%= lucide_icon "terminal", class: "w-16 h-16 text-tertiary mx-auto mb-4" %>
+          <p class="text-secondary">No command executions yet.</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

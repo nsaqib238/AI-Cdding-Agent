@@ -1,0 +1,79 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <%= link_to projects_path, class: "inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-4" do %>
+      <%= lucide_icon "arrow-left", class: "w-4 h-4" %>
+      <span>Back to Projects</span>
+    <% end %>
+
+    <div class="flex items-start justify-between">
+      <div>
+        <div class="flex items-center gap-3 mb-2">
+          <%= lucide_icon "folder", class: "w-8 h-8 text-primary" %>
+          <h1 class="text-3xl font-mono font-bold text-primary"><%= @project.name %></h1>
+        </div>
+        
+        <% if @project.description.present? %>
+          <p class="text-secondary text-lg"><%= @project.description %></p>
+        <% end %>
+
+        <div class="flex items-center gap-4 text-sm text-tertiary mt-3">
+          <div class="flex items-center gap-1">
+            <%= lucide_icon "folder-open", class: "w-4 h-4" %>
+            <span class="font-mono"><%= @project.absolute_path %></span>
+          </div>
+          <span class="badge <%= @project.status == 'active' ? 'badge-primary' : 'badge-secondary' %>">
+            <%= @project.status %>
+          </span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <%= link_to "#", class: "btn-secondary" do %>
+          <%= lucide_icon "message-circle", class: "w-5 h-5" %>
+          <span class="ml-2">Chat</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Files List -->
+  <div class="card">
+    <div class="card-header flex items-center justify-between">
+      <h2 class="text-xl font-mono font-semibold text-primary">Project Files</h2>
+      <div class="text-sm text-tertiary">
+        <%= @project.coding_files.count %> files
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <% if @files.any? %>
+        <div class="divide-y divide-border">
+          <% @files.each do |file_path| %>
+            <div class="flex items-center gap-3 p-4 hover:bg-surface-elevated transition-colors">
+              <div class="w-8 h-8 rounded flex items-center justify-center bg-primary/10">
+                <%= lucide_icon "file-code", class: "w-5 h-5 text-primary" %>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="font-mono text-sm text-primary truncate">
+                  <%= file_path %>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-tertiary mt-1">
+                  <span><%= number_to_human_size(File.size(File.join(@project.absolute_path, file_path))) rescue 0 %></span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+
+      <% else %>
+        <div class="p-12 text-center">
+          <%= lucide_icon "file", class: "w-16 h-16 text-tertiary mx-auto mb-4" %>
+          <p class="text-secondary">No files in this project yet.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

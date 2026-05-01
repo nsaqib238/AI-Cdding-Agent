@@ -1,0 +1,103 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <%= link_to command_executions_path, class: "inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-4" do %>
+      <%= lucide_icon "arrow-left", class: "w-4 h-4" %>
+      <span>Back to Executions</span>
+    <% end %>
+
+    <div class="flex items-start justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <%= lucide_icon "terminal", class: "w-8 h-8 text-primary" %>
+          <h1 class="text-3xl font-mono font-bold text-primary">Command Execution</h1>
+        </div>
+
+        <% if @conversation.present? %>
+          <div class="flex items-center gap-2 text-sm text-secondary mt-2">
+            <%= lucide_icon "message-circle", class: "w-4 h-4" %>
+            <%= link_to @conversation.title, conversation_path(@conversation), class: "hover:text-primary transition-colors" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="badge badge-lg <%= case @execution.status
+          when 'success' then 'badge-success'
+          when 'failed' then 'badge-danger'
+          when 'running' then 'badge-warning'
+          else 'badge-secondary'
+        end %>">
+          <%= @execution.status %>
+        </span>
+        <% if @execution.exit_code.present? %>
+          <span class="badge badge-lg badge-secondary">
+            exit: <%= @execution.exit_code %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Card -->
+  <div class="card mb-6">
+    <div class="card-header">
+      <h2 class="text-lg font-mono font-semibold text-primary">Command</h2>
+    </div>
+    <div class="card-body">
+      <div class="bg-surface-elevated rounded-lg p-4 font-mono text-sm text-primary">
+        $ <%= @execution.command %>
+      </div>
+      
+      <div class="flex items-center gap-4 mt-4 text-sm text-tertiary">
+        <div class="flex items-center gap-2">
+          <%= lucide_icon "clock", class: "w-4 h-4" %>
+          <span>Executed <%= time_ago_in_words(@execution.created_at) %> ago</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <%= lucide_icon "calendar", class: "w-4 h-4" %>
+          <span><%= @execution.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output Card -->
+  <div class="card">
+    <div class="card-header flex items-center justify-between">
+      <h2 class="text-lg font-mono font-semibold text-primary">Output</h2>
+      <% if @execution.output.present? %>
+        <button class="btn-secondary btn-sm" onclick="navigator.clipboard.writeText(this.closest('.card').querySelector('pre').textContent)">
+          <%= lucide_icon "copy", class: "w-4 h-4" %>
+          <span class="ml-2">Copy</span>
+        </button>
+      <% end %>
+    </div>
+    <div class="card-body p-0">
+      <% if @execution.output.present? %>
+        <div class="bg-surface font-mono text-sm overflow-auto max-h-[600px]">
+          <pre class="p-4 text-secondary whitespace-pre-wrap"><%= @execution.output %></pre>
+        </div>
+      <% else %>
+        <div class="p-12 text-center">
+          <p class="text-tertiary">No output</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="mt-6 flex gap-3">
+    <% if @conversation.present? %>
+      <%= link_to conversation_path(@conversation), class: "btn-secondary" do %>
+        <%= lucide_icon "message-circle", class: "w-5 h-5" %>
+        <span class="ml-2">Back to Conversation</span>
+      <% end %>
+    <% end %>
+    
+    <%= link_to command_executions_path, class: "btn-outline" do %>
+      <%= lucide_icon "list", class: "w-5 h-5" %>
+      <span class="ml-2">All Executions</span>
+    <% end %>
+  </div>
+</div>

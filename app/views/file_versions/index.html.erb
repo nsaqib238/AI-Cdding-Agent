@@ -1,0 +1,76 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <%= link_to coding_file_path(@file), class: "inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-4" do %>
+      <%= lucide_icon "arrow-left", class: "w-4 h-4" %>
+      <span>Back to File</span>
+    <% end %>
+
+    <div class="flex items-center gap-3 mb-2">
+      <%= lucide_icon "git-branch", class: "w-8 h-8 text-primary" %>
+      <h1 class="text-3xl font-mono font-bold text-primary">Version History</h1>
+    </div>
+    <p class="text-secondary"><%= @file.relative_path %></p>
+    <p class="text-sm text-tertiary mt-1">Current version: v<%= @file.version %></p>
+  </div>
+
+  <div class="grid gap-4">
+    <% if @versions.any? %>
+      <% @versions.each do |version| %>
+        <div class="card">
+          <div class="card-body">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="badge badge-primary">v<%= version.version %></span>
+                  <%= lucide_icon "clock", class: "w-4 h-4 text-tertiary" %>
+                  <span class="text-sm text-tertiary">
+                    <%= time_ago_in_words(version.created_at) %> ago
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-4 text-sm text-tertiary">
+                  <div class="flex items-center gap-1">
+                    <%= lucide_icon "file", class: "w-4 h-4" %>
+                    <span><%= number_to_human_size(version.size) %></span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <%= lucide_icon "type", class: "w-4 h-4" %>
+                    <span><%= version.content.lines.count %> lines</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <%= link_to file_version_path(version), class: "btn-secondary btn-sm" do %>
+                  <%= lucide_icon "eye", class: "w-4 h-4" %>
+                  <span class="ml-2">View</span>
+                <% end %>
+                
+                <% unless version.version == @file.version %>
+                  <%= button_to file_versions_path(coding_file_id: @file.id, target_version: version.version), 
+                      method: :post,
+                      class: "btn-outline btn-sm",
+                      data: { turbo_confirm: "Rollback to version #{version.version}? This will create a new version." } do %>
+                    <%= lucide_icon "rotate-ccw", class: "w-4 h-4" %>
+                    <span class="ml-2">Rollback</span>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="mt-6">
+        <%= paginate @versions %>
+      </div>
+    <% else %>
+      <div class="card">
+        <div class="card-body text-center py-12">
+          <%= lucide_icon "git-branch", class: "w-16 h-16 text-tertiary mx-auto mb-4" %>
+          <p class="text-secondary">No version history yet.</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <% if @conversation.present? %>
+      <%= link_to conversation_path(@conversation), class: "inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-4" do %>
+        <%= lucide_icon "arrow-left", class: "w-4 h-4" %>
+        <span>Back to Conversation</span>
+      <% end %>
+    <% end %>
+
+    <div class="flex items-center gap-3 mb-2">
+      <%= lucide_icon "list-checks", class: "w-8 h-8 text-primary" %>
+      <h1 class="text-3xl font-mono font-bold text-primary">
+        <% if @conversation.present? %>
+          Tasks for <%= @conversation.title %>
+        <% else %>
+          All Agent Tasks
+        <% end %>
+      </h1>
+    </div>
+    <p class="text-secondary">Track agent task execution and progress</p>
+  </div>
+
+  <div class="grid gap-4">
+    <% if @tasks.any? %>
+      <% @tasks.each do |task| %>
+        <div class="card">
+          <div class="card-body">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <% case task.status %>
+                  <% when 'pending' %>
+                    <span class="badge badge-secondary">
+                      <%= lucide_icon "clock", class: "w-3 h-3 inline-block mr-1" %>
+                      Pending
+                    </span>
+                  <% when 'in_progress' %>
+                    <span class="badge badge-primary">
+                      <%= lucide_icon "loader", class: "w-3 h-3 inline-block mr-1" %>
+                      In Progress
+                    </span>
+                  <% when 'completed' %>
+                    <span class="badge badge-success">
+                      <%= lucide_icon "check-circle", class: "w-3 h-3 inline-block mr-1" %>
+                      Completed
+                    </span>
+                  <% when 'failed' %>
+                    <span class="badge badge-danger">
+                      <%= lucide_icon "x-circle", class: "w-3 h-3 inline-block mr-1" %>
+                      Failed
+                    </span>
+                  <% end %>
+                  
+                  <h3 class="text-lg font-mono font-semibold text-primary"><%= task.title %></h3>
+                </div>
+
+                <% if task.description.present? %>
+                  <p class="text-secondary mb-3"><%= task.description %></p>
+                <% end %>
+
+                <div class="flex items-center gap-4 text-sm text-tertiary">
+                  <div class="flex items-center gap-1">
+                    <%= lucide_icon "clock", class: "w-4 h-4" %>
+                    <span><%= time_ago_in_words(task.created_at) %> ago</span>
+                  </div>
+                  <% if @conversation.blank? %>
+                    <div class="flex items-center gap-1">
+                      <%= lucide_icon "message-square", class: "w-4 h-4" %>
+                      <span><%= task.conversation.title %></span>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <%= link_to agent_task_path(task), class: "btn-secondary btn-sm" do %>
+                  <%= lucide_icon "eye", class: "w-4 h-4" %>
+                  <span class="ml-2">View Details</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="mt-6">
+        <%= paginate @tasks %>
+      </div>
+    <% else %>
+      <div class="card">
+        <div class="card-body text-center py-12">
+          <%= lucide_icon "list-checks", class: "w-16 h-16 text-tertiary mx-auto mb-4" %>
+          <p class="text-secondary">No agent tasks yet.</p>
+          <% if @conversation.present? %>
+            <p class="text-tertiary mt-2">Start a conversation to generate tasks.</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

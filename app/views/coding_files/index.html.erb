@@ -1,0 +1,52 @@
+<% if @project.present? %>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="card">
+      <div class="card-header flex items-center justify-between">
+        <h2 class="text-xl font-mono font-semibold text-primary"><%= @project.name %> Files</h2>
+      </div>
+
+      <div class="card-body p-0">
+        <% if @files.any? %>
+          <div class="divide-y divide-border">
+            <% @files.each do |file| %>
+              <%= link_to coding_file_path(file), class: "flex items-center gap-3 p-4 hover:bg-surface-elevated transition-colors" do %>
+                <div class="font-mono text-sm text-primary truncate">
+                  <%= file.relative_path %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="p-12 text-center">
+            <p class="text-secondary">No files yet.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-mono font-bold text-primary mb-8">All Files</h1>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <% if @files.any? %>
+          <div class="divide-y divide-border">
+            <% @files.each do |file| %>
+              <%= link_to coding_file_path(file), class: "flex items-center gap-3 p-4 hover:bg-surface-elevated transition-colors" do %>
+                <div class="flex-1">
+                  <div class="font-mono text-sm text-primary"><%= file.relative_path %></div>
+                  <div class="text-xs text-tertiary mt-1"><%= file.project.name %></div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="p-12 text-center">
+            <p class="text-secondary">No files yet.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

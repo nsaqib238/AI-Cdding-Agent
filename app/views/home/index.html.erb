@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-surface flex flex-col items-center justify-center p-8">
+  <div class="max-w-3xl w-full text-center">
+    <!-- Logo/Icon -->
+    <div class="mb-8">
+      <%= lucide_icon "code-2", class: "w-24 h-24 text-primary mx-auto mb-6" %>
+      <h1 class="text-5xl font-mono font-bold text-primary mb-3">
+        AI Vibe Coder
+      </h1>
+      <p class="text-xl text-secondary">
+        Your desktop AI coding assistant - like Cursor, but yours
+      </p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-12">
+      <%= link_to projects_path, class: "card card-hover p-8" do %>
+        <div class="flex flex-col items-center gap-3">
+          <%= lucide_icon "folder-open", class: "w-12 h-12 text-primary" %>
+          <h2 class="text-xl font-mono font-semibold text-primary">Open Project</h2>
+          <p class="text-secondary">
+            Connect to an existing project directory on your filesystem
+          </p>
+        </div>
+      <% end %>
+
+      <%= link_to conversations_path, class: "card card-hover p-8" do %>
+        <div class="flex flex-col items-center gap-3">
+          <%= lucide_icon "message-square", class: "w-12 h-12 text-primary" %>
+          <h2 class="text-xl font-mono font-semibold text-primary">Conversations</h2>
+          <p class="text-secondary">
+            View your recent AI coding sessions and chat history
+          </p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Features -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+      <div class="text-center">
+        <%= lucide_icon "file-code", class: "w-8 h-8 text-primary mx-auto mb-3" %>
+        <h3 class="font-mono font-semibold text-primary mb-2">Direct File Access</h3>
+        <p class="text-sm text-tertiary">
+          Read & write files directly on your filesystem - no cloud storage needed
+        </p>
+      </div>
+
+      <div class="text-center">
+        <%= lucide_icon "zap", class: "w-8 h-8 text-primary mx-auto mb-3" %>
+        <h3 class="font-mono font-semibold text-primary mb-2">Real-time AI</h3>
+        <p class="text-sm text-tertiary">
+          Streaming LLM responses with tool calling for code generation & editing
+        </p>
+      </div>
+
+      <div class="text-center">
+        <%= lucide_icon "terminal", class: "w-8 h-8 text-primary mx-auto mb-3" %>
+        <h3 class="font-mono font-semibold text-primary mb-2">Command Execution</h3>
+        <p class="text-sm text-tertiary">
+          Run terminal commands directly from AI suggestions with full tracking
+        </p>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-12 p-6 bg-surface-elevated rounded-lg border border-border max-w-2xl mx-auto">
+      <div class="flex items-start gap-4">
+        <%= lucide_icon "info", class: "w-5 h-5 text-primary flex-shrink-0 mt-0.5" %>
+        <div class="text-left">
+          <p class="text-sm text-secondary">
+            <span class="font-semibold text-primary">Single-user desktop mode:</span>
+            This app is designed for your local machine. No user accounts, no cloud sync - just you and your code.
+            All project files stay on your filesystem where they belong.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
