@@ -67,3 +67,19 @@ Default password: admin
 * kaminari
 * puma
 * rspec
+
+## Documentation
+
+### AI Tool System
+
+* **[Tool Capabilities](TOOL_CAPABILITIES.md)** - Complete list of all AI tools (Level 1-10)
+* **[Tool Maintenance Guide](docs/TOOL_MAINTENANCE_GUIDE.md)** - How to add, update, or remove AI tools
+* **[Example: Adding a New Tool](docs/EXAMPLE_NEW_TOOL.md)** - Step-by-step example of adding a `find_todos` tool
+* **[Project Documentation](docs/project.md)** - Deployment, architecture, and environment setup
+
+### Quick Links
+
+**Want to add a new tool to your AI assistant?**
+1. Read [Tool Maintenance Guide](docs/TOOL_MAINTENANCE_GUIDE.md) for complete instructions
+2. See [Example: Adding a New Tool](docs/EXAMPLE_NEW_TOOL.md) for a real-world implementation
+3. Check [Tool Capabilities](TOOL_CAPABILITIES.md) to understand existing tools
