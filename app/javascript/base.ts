@@ -11,7 +11,6 @@ import { StreamActions } from "@hotwired/turbo"
 import { showToast } from './toast'
 import './controllers'
 import './clipboard_utils'
-import './sdk_utils'
 import './stimulus_validator'
 import './channels'
 

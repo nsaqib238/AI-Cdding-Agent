@@ -10,16 +10,100 @@ class AiAgentService < ApplicationService
   def call
     system_prompt = build_system_prompt
 
-    # Stream LLM response without tool calling for now
-    # TODO: Implement tool calling via separate mechanism
+    # Stream LLM response with tool calling enabled
     LlmStreamJob.perform_later(
       stream_name: stream_name,
       prompt: prompt,
-      system: system_prompt
+      system: system_prompt,
+      conversation_id: conversation.id,
+      tools: build_tool_definitions
     )
   end
 
   private
+
+  def build_tool_definitions
+    [
+      {
+        type: "function",
+        function: {
+          name: "read_file",
+          description: "Read the contents of a file from the project directory",
+          parameters: {
+            type: "object",
+            properties: {
+              path: {
+                type: "string",
+                description: "Relative path to the file (e.g., 'app/models/user.rb')"
+              }
+            },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "write_file",
+          description: "Write or update a file with new content. Creates the file and parent directories if they don't exist.",
+          parameters: {
+            type: "object",
+            properties: {
+              path: {
+                type: "string",
+                description: "Relative path to the file (e.g., 'app/services/new_service.rb')"
+              },
+              content: {
+                type: "string",
+                description: "The complete file content to write"
+              }
+            },
+            required: ["path", "content"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "run_command",
+          description: "Execute a shell command in the project directory. Use for running tests, builds, git commands, etc.",
+          parameters: {
+            type: "object",
+            properties: {
+              command: {
+                type: "string",
+                description: "The shell command to execute (e.g., 'rails test', 'npm install')"
+              }
+            },
+            required: ["command"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "list_files",
+          description: "List files in the project directory matching a pattern",
+          parameters: {
+            type: "object",
+            properties: {
+              pattern: {
+                type: "string",
+                description: "Glob pattern to match files (e.g., '**/*.rb' for all Ruby files, '**/*' for all files)",
+                default: "**/*"
+              },
+              include_hidden: {
+                type: "boolean",
+                description: "Whether to include hidden files (starting with .)",
+                default: false
+              }
+            },
+            required: []
+          }
+        }
+      }
+    ]
+  end
 
   def build_system_prompt
     <<~PROMPT

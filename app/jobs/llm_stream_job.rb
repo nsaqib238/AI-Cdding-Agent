@@ -9,25 +9,40 @@ class LlmStreamJob < ApplicationJob
   # Streaming LLM responses via ActionCable
   # Usage:
   #   LlmStreamJob.perform_later(stream_name: 'chat_123', prompt: "Hello")
-  #   LlmStreamJob.perform_later(stream_name: 'chat_456', prompt: "...", tools: [...], tool_handler: ...)
+  #   LlmStreamJob.perform_later(stream_name: 'chat_456', prompt: "...", tools: [...], conversation_id: 1)
   #
   # CRITICAL: ALL broadcasts MUST have 'type' field (auto-routes to client handler)
   # - type: 'chunk' → client calls handleChunk(data)
   # - type: 'complete' → client calls handleComplete(data)
   # - type: 'tool_call' → (optional) client calls handleToolCall(data)
-  def perform(stream_name:, prompt:, system: nil, **options)
+  # - type: 'tool_result' → (optional) client calls handleToolResult(data)
+  def perform(stream_name:, prompt:, system: nil, conversation_id: nil, **options)
     full_content = ""
 
-    # Wrap tool_handler to broadcast tool calls if provided
-    if options[:tool_handler]
-      original_handler = options[:tool_handler]
+    # If tools are provided and conversation_id is given, wrap with tool handler
+    if options[:tools].present? && conversation_id.present?
+      conversation = Conversation.find(conversation_id)
+      agent_service = AiAgentService.new(conversation: conversation, prompt: prompt, stream_name: stream_name)
+      
       options[:tool_handler] = ->(name, args) {
+        # Broadcast tool call to UI
         ActionCable.server.broadcast(stream_name, {
           type: 'tool_call',
           tool_name: name,
           arguments: args
         })
-        original_handler.call(name, args)
+        
+        # Execute tool via agent service
+        result = agent_service.send(:handle_tool_call, name, args)
+        
+        # Broadcast result to UI
+        ActionCable.server.broadcast(stream_name, {
+          type: 'tool_result',
+          tool_name: name,
+          result: result
+        })
+        
+        result
       }
     end
 

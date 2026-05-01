@@ -112,6 +112,18 @@ export default class extends BaseChannelController {
     this.scrollToBottom()
   }
 
+  // Handle tool call (AI is executing a tool)
+  protected handleToolCall(data: any): void {
+    const toolMessage = this.createToolMessage('call', data.tool_name, data.arguments)
+    this.scrollToBottom()
+  }
+
+  // Handle tool result (Tool execution completed)
+  protected handleToolResult(data: any): void {
+    const toolMessage = this.createToolMessage('result', data.tool_name, data.result)
+    this.scrollToBottom()
+  }
+
   // Helper: Append complete message
   private appendMessage(role: string, content: string, timestamp: string): void {
     const messageEl = this.createMessage(role)
@@ -148,5 +160,34 @@ export default class extends BaseChannelController {
   // Helper: Scroll to bottom
   private scrollToBottom(): void {
     this.messagesTarget.scrollTop = this.messagesTarget.scrollHeight
+  }
+
+  // Helper: Create tool message element
+  private createToolMessage(type: 'call' | 'result', toolName: string, data: any): HTMLElement {
+    const messageEl = document.createElement('div')
+    messageEl.className = 'message message-tool mb-4 flex gap-3'
+
+    const icon = document.createElement('div')
+    icon.className = 'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-accent/20 text-accent'
+    icon.innerHTML = type === 'call' ? '🔧' : '✓'
+
+    const contentWrapper = document.createElement('div')
+    contentWrapper.className = 'flex-1'
+
+    const toolLabel = document.createElement('div')
+    toolLabel.className = 'text-xs font-mono text-tertiary mb-1'
+    toolLabel.textContent = type === 'call' ? `Calling ${toolName}...` : `${toolName} completed`
+
+    const contentEl = document.createElement('div')
+    contentEl.className = 'text-xs font-mono text-secondary bg-surface/50 p-2 rounded border border-border overflow-x-auto'
+    contentEl.textContent = JSON.stringify(data, null, 2)
+
+    contentWrapper.appendChild(toolLabel)
+    contentWrapper.appendChild(contentEl)
+    messageEl.appendChild(icon)
+    messageEl.appendChild(contentWrapper)
+
+    this.messagesTarget.appendChild(messageEl)
+    return messageEl
   }
 }
