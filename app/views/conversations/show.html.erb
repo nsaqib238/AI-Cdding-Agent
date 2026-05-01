@@ -1,5 +1,58 @@
-<div class="h-screen flex flex-col bg-surface">
-  <!-- Header -->
+<div class="h-screen flex bg-surface">
+  <!-- File Tree Sidebar -->
+  <% if @conversation.project %>
+    <div 
+      class="file-tree-sidebar w-64 border-r border-border bg-card flex-shrink-0 flex flex-col"
+      data-controller="file-tree"
+      data-file-tree-project-id-value="<%= @conversation.project.id %>"
+      data-file-tree-conversation-id-value="<%= @conversation.id %>"
+      data-file-tree-tree-data-value="<%= @file_tree.to_json %>"
+    >
+      <!-- Sidebar Header -->
+      <div class="p-4 border-b border-border">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-primary flex items-center gap-2">
+            <%= lucide_icon "folder-tree", class: "w-4 h-4" %>
+            Files
+          </h3>
+          <button 
+            class="text-tertiary hover:text-primary transition-colors"
+            data-action="click->file-tree#toggleSidebar"
+            data-file-tree-target="toggle"
+            title="Collapse sidebar"
+          >
+            <%= lucide_icon "sidebar-close", class: "w-4 h-4" %>
+          </button>
+        </div>
+        
+        <!-- Search -->
+        <input 
+          type="text"
+          placeholder="Search files..."
+          class="form-input text-sm"
+          data-file-tree-target="search"
+          data-action="input->file-tree#search"
+        />
+      </div>
+
+      <!-- Tree Container -->
+      <div 
+        class="flex-1 overflow-y-auto p-2"
+        data-file-tree-target="tree"
+      >
+        <!-- Tree rendered by Stimulus controller -->
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="p-3 border-t border-border text-xs text-tertiary">
+        <%= @file_tree[:total_items] || 0 %> items
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Main Chat Area -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
   <div class="border-b border-border bg-card">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
       <div class="flex items-center justify-between">
@@ -37,9 +90,8 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Chat Container -->
+    <!-- Chat Container -->
   <div class="flex-1 overflow-hidden">
     <div 
       class="h-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col"

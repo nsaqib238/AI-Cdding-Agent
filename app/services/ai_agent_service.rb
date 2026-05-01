@@ -289,6 +289,35 @@ class AiAgentService < ApplicationService
           }
         }
       },
+      # Visual File Tree Navigation
+      {
+        type: "function",
+        function: {
+          name: "get_file_tree",
+          description: "Get hierarchical file tree structure with folders and files for visual navigation",
+          parameters: {
+            type: "object",
+            properties: {
+              path: {
+                type: "string",
+                description: "Root path to start tree from (default: project root)",
+                default: "."
+              },
+              max_depth: {
+                type: "integer",
+                description: "Maximum directory depth to traverse",
+                default: 5
+              },
+              include_hidden: {
+                type: "boolean",
+                description: "Include hidden files/folders (starting with .)",
+                default: false
+              }
+            },
+            required: []
+          }
+        }
+      },
       # Level 10: Advanced Refactoring & Debugging
       {
         type: "function",
@@ -615,6 +644,8 @@ class AiAgentService < ApplicationService
       run_command_tool(arguments)
     when 'list_files'
       list_files_tool(arguments)
+    when 'get_file_tree'
+      get_file_tree_tool(arguments)
     # Level 6-7: Context awareness
     when 'search_files'
       search_files_tool(arguments)
@@ -745,5 +776,67 @@ class AiAgentService < ApplicationService
       files: files,
       count: files.length
     }
+  end
+
+  def get_file_tree_tool(arguments)
+    project = conversation.project
+    return { error: 'No project associated' } unless project
+
+    root_path = arguments['path'] || '.'
+    max_depth = arguments['max_depth'] || 5
+    include_hidden = arguments['include_hidden'] || false
+
+    full_root = File.join(project.absolute_path, root_path)
+    return { error: "Path not found: #{root_path}" } unless File.exist?(full_root)
+
+    tree = build_file_tree(full_root, project.absolute_path, 0, max_depth, include_hidden)
+    
+    {
+      root: root_path,
+      tree: tree,
+      total_items: count_tree_items(tree)
+    }
+  end
+
+  def build_file_tree(current_path, project_root, depth, max_depth, include_hidden)
+    return nil if depth > max_depth
+    return nil unless File.exist?(current_path)
+
+    relative_path = current_path.sub("#{project_root}/", '')
+    name = File.basename(current_path)
+    
+    # Skip hidden files/folders unless explicitly requested
+    return nil if name.start_with?('.') && !include_hidden
+
+    if File.directory?(current_path)
+      children = Dir.entries(current_path)
+        .reject { |entry| entry == '.' || entry == '..' }
+        .map { |entry| build_file_tree(File.join(current_path, entry), project_root, depth + 1, max_depth, include_hidden) }
+        .compact
+        .sort_by { |child| [child[:type] == 'file' ? 1 : 0, child[:name]] } # Folders first, then files
+
+      {
+        type: 'directory',
+        name: name,
+        path: relative_path == name ? name : relative_path,
+        children: children,
+        item_count: children.length
+      }
+    else
+      {
+        type: 'file',
+        name: name,
+        path: relative_path == name ? name : relative_path,
+        size: File.size(current_path),
+        extension: File.extname(name)
+      }
+    end
+  end
+
+  def count_tree_items(tree)
+    return 0 unless tree
+    return 1 if tree[:type] == 'file'
+    
+    1 + tree[:children].sum { |child| count_tree_items(child) }
   end
 end

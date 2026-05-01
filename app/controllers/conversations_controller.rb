@@ -8,6 +8,18 @@ class ConversationsController < ApplicationController
     @conversation = Conversation.find(params[:id])
     @messages = @conversation.messages.order(created_at: :asc)
     @stream_name = "conversation_#{@conversation.id}"
+    
+    # Load file tree for project
+    if @conversation.project
+      service = AiAgentService.new(
+        conversation: @conversation,
+        prompt: '',
+        stream_name: @stream_name
+      )
+      @file_tree = service.send(:get_file_tree_tool, { 'path' => '.', 'max_depth' => 5, 'include_hidden' => false })
+    else
+      @file_tree = { total_items: 0, tree: nil }
+    end
   end
 
   def create

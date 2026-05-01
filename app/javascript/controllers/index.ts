@@ -5,6 +5,7 @@ import DropdownController from "./dropdown_controller"
 import ClipboardController from "./clipboard_controller"
 import FlashController from "./flash_controller"
 import ChatController from "./chat_controller"
+import FileTreeController from "./file_tree_controller"
 
 const application = Application.start()
 
@@ -13,5 +14,6 @@ application.register("dropdown", DropdownController)
 application.register("clipboard", ClipboardController)
 application.register("flash", FlashController)
 application.register("chat", ChatController)
+application.register("file-tree", FileTreeController)
 
 window.Stimulus = application
